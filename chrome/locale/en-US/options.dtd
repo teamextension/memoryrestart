@@ -1,0 +1,7 @@
+<!ENTITY prefwindow.title "Memory Restart Preferences">
+<!ENTITY pane1.title "Memory Restart Preferences">
+<!ENTITY memorylimit.label "Firefox memory threshold (Mb)">
+<!ENTITY colorabovelimit.label "Text color when memory is above threshold">
+<!ENTITY colorbelowlimit.label "Text color when memory is below threshold">
+<!ENTITY autorestart.label "Restart Firefox automatically?">
+

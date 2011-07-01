@@ -1,0 +1,7 @@
+#memoryrestart-button {
+    list-style-image: url("chrome://memoryrestart/skin/below24.png");
+}
+
+toolbar[iconsize="small"] #memoryrestart-button {
+    list-style-image: url("chrome://memoryrestart/skin/below16.png");
+}

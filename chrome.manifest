@@ -1,0 +1,7 @@
+content   memoryrestart                 chrome/content/
+skin      memoryrestart   classic/1.0   chrome/skin/
+locale    memoryrestart   en-US         chrome/locale/en-US/
+
+overlay   chrome://browser/content/browser.xul   chrome://memoryrestart/content/memoryrestart.xul
+
+style     chrome://global/content/customizeToolbar.xul   chrome://memoryrestart/skin/toolbar.css
