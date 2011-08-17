@@ -26,7 +26,11 @@ TeamEXtension.MemoryRestart = {
 		var e = memoryReporterManager.enumerateReporters();
 		while (e.hasMoreElements()) {
 			var mr = e.getNext().QueryInterface(Ci.nsIMemoryReporter);
-			if (mr.path == "malloc/mapped") {
+			
+			// var consoleService = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
+			// consoleService.logStringMessage("mr.path=" + mr.path);
+			
+			if ((mr.path == "malloc/mapped") || (mr.path == "resident")) {
 				memoryUsed = mr.memoryUsed;
 				break;
 			}
@@ -36,6 +40,7 @@ TeamEXtension.MemoryRestart = {
 		var memoryrestartPanel = document.getElementById('memoryrestart-panel');
 		
 		var memoryUsedInMb = memoryUsed / (1024 * 1024);
+		memoryUsedInMb = memoryUsedInMb.toFixed();
 		memoryrestartPanel.label = memoryUsedInMb + "Mb";
 
 		var strings = document.getElementById("memoryrestart-strings");
