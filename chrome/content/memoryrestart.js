@@ -16,23 +16,61 @@ TeamEXtension.MemoryRestart = {
 		this.refreshMemory();
 		window.setInterval(this.refreshMemory, interval);
 	},
+	
+	isFF6Below: function() {
+		var appInfo = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULAppInfo);
+		var versionChecker = Components.classes["@mozilla.org/xpcom/version-comparator;1"].getService(Components.interfaces.nsIVersionComparator);
+		return (versionChecker.compare(appInfo.version, "6.0") < 0);
+	},
 
 	refreshMemory: function()
 	{
 		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
 		var memoryReporterManager = Cc["@mozilla.org/memory-reporter-manager;1"].getService(Ci.nsIMemoryReporterManager);
-
+		
+		var check_malloc_mapped = TeamEXtension.MemoryRestart.isFF6Below();
+		var check_resident = !check_malloc_mapped;
+		var check_private = check_resident;
+		
 		var memoryUsed = 0;
 		var e = memoryReporterManager.enumerateReporters();
-		while (e.hasMoreElements()) {
+		while (e.hasMoreElements() && (check_malloc_mapped || check_resident || check_private)) {
 			var mr = e.getNext().QueryInterface(Ci.nsIMemoryReporter);
 			
 			// var consoleService = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
 			// consoleService.logStringMessage("mr.path=" + mr.path);
 			
-			if ((mr.path == "malloc/mapped") || (mr.path == "resident")) {
-				memoryUsed = mr.memoryUsed;
-				break;
+			//if ((mr.path == "malloc/mapped") || (mr.path == "resident")) {
+			//	memoryUsed = mr.memoryUsed;
+			//	break;
+			//}
+			
+			if (check_malloc_mapped && (mr.path == "malloc/mapped")) { // ff6 below only
+				var memoryUsed_malloc_mapped = mr.memoryUsed;
+				if (memoryUsed_malloc_mapped != undefined && memoryUsed < memoryUsed_malloc_mapped) {
+					memoryUsed = memoryUsed_malloc_mapped;
+				}
+				check_malloc_mapped = false;
+			}
+			if (check_resident && (mr.path == "resident")) { // starting ff6
+				var memoryUsed_resident = mr.memoryUsed;
+				if (memoryUsed_resident == undefined) { // ff7 started using "amount"
+					memoryUsed_resident = mr.amount;
+				}
+				if (memoryUsed_resident != undefined && memoryUsed < memoryUsed_resident) {
+					memoryUsed = memoryUsed_resident;
+				}
+				check_resident = false;
+			}
+			if (check_private && (mr.path == "private")) { // starting ff6
+				var memoryUsed_private = mr.memoryUsed;
+				if (memoryUsed_private == undefined) { // ff7 started using "amount"
+					memoryUsed_private = mr.amount;
+				}
+				if (memoryUsed_private != undefined && memoryUsed < memoryUsed_private) {
+					memoryUsed = memoryUsed_private;
+				}
+				check_private = false;
 			}
 		}
 
