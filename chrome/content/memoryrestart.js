@@ -4,6 +4,26 @@ if ("undefined" == typeof(TeamEXtension)) {
 
 TeamEXtension.MemoryRestart = {
 	onLoad: function() {
+		try {
+            Components.utils.import("resource://gre/modules/AddonManager.jsm");
+            this.listener = {
+                onUninstalling: function onUninstalling(addon) {
+                    TeamEXtension.MemoryRestart.prefCleanUp(addon);
+                },
+            };   
+            AddonManager.addAddonListener(this.listener); 
+            
+            this.installListener = {
+        		onInstallEnded: function (install, addon) {
+        			TeamEXtension.MemoryRestart.prefCleanUp(addon);
+                },
+        	};
+            AddonManager.addInstallListener(this.installListener);
+        }
+        catch(e) {
+        	//observerService.addObserver(this, "em-action-requested", false);
+        }    
+		
 		if (this.firstRun()) {
 			this.addToolbarButton();
 		}
@@ -199,6 +219,13 @@ TeamEXtension.MemoryRestart = {
 			prefService.setCharPref("extensions.memoryrestart.version", version);
 			var strings = document.getElementById("memoryrestart-strings");
 			gBrowser.selectedTab = gBrowser.addTab(strings.getString("extensions.memoryrestart.url"));
+		}
+	},
+	
+	prefCleanUp: function(addon) {
+		if (addon.id === "memoryrestart@teamextension.com") {
+			var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+			prefService.setCharPref("extensions.memoryrestart.version", '0');
 		}
 	}
 };
