@@ -37,33 +37,19 @@ TeamEXtension.MemoryRestart = {
 		window.setInterval(this.refreshMemory, interval);
 	},
 	
-	isFF6Below: function() {
-		var appInfo = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULAppInfo);
-		var versionChecker = Components.classes["@mozilla.org/xpcom/version-comparator;1"].getService(Components.interfaces.nsIVersionComparator);
-		return (versionChecker.compare(appInfo.version, "6.0") < 0);
-	},
-
 	refreshMemory: function()
 	{
 		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
 		var memoryReporterManager = Cc["@mozilla.org/memory-reporter-manager;1"].getService(Ci.nsIMemoryReporterManager);
 		
-		var check_malloc_mapped = TeamEXtension.MemoryRestart.isFF6Below();
-		var check_resident = !check_malloc_mapped;
-		var check_private = check_resident;
+		var check_malloc_mapped = true;
+		var check_resident = true;
+		var check_private = true;
 		
 		var memoryUsed = 0;
 		var e = memoryReporterManager.enumerateReporters();
 		while (e.hasMoreElements() && (check_malloc_mapped || check_resident || check_private)) {
 			var mr = e.getNext().QueryInterface(Ci.nsIMemoryReporter);
-			
-			// var consoleService = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
-			// consoleService.logStringMessage("mr.path=" + mr.path);
-			
-			//if ((mr.path == "malloc/mapped") || (mr.path == "resident")) {
-			//	memoryUsed = mr.memoryUsed;
-			//	break;
-			//}
 			
 			if (check_malloc_mapped && (mr.path == "malloc/mapped")) { // ff6 below only
 				var memoryUsed_malloc_mapped = mr.memoryUsed;
