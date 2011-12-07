@@ -1,2 +1,6 @@
 Firefox Memory Restart
- - FireFox 8.* and previous version compatible
+
+Development
+1. Create a text file called %USER-DIR%\Application Data\Mozilla\Firefox\Profiles\extensions\memoryrestart@teamextension.com
+2. Inside the text file, insert the text "C:\tex\dev\workspaces\teamextension\memoryrestart\".
+3. For more information, see https://developer.mozilla.org/en/Building_an_Extension.
