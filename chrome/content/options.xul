@@ -8,6 +8,7 @@
       <preference id="colorabovelimit" name="extensions.memoryrestart.colorabovelimit" type="string"/>
       <preference id="colorbelowlimit" name="extensions.memoryrestart.colorbelowlimit" type="string"/>
       <preference id="autorestart" name="extensions.memoryrestart.autorestart" type="bool"/>
+      <preference id="showprompt" name="extensions.memoryrestart.showprompt" type="bool"/>
     </preferences>
 	<grid>
 	  <columns>
@@ -31,6 +32,10 @@
 	    <hbox>
 	    	<checkbox id="autorestart" preference="autorestart"/>
 	    	<label control="autorestart">&autorestart.label;</label>
+		</hbox>
+		<hbox>
+	    	<checkbox id="showprompt" preference="showprompt"/>
+	    	<label control="showprompt">&showprompt.label;</label>
 		</hbox>
 	  </rows>
 	</grid>

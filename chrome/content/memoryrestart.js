@@ -124,10 +124,16 @@ TeamEXtension.MemoryRestart = {
 
 	restartFirefox: function()
 	{
-		var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
-		var strings = document.getElementById("memoryrestart-strings");
-		
-		if (prompts.confirm(window, strings.getString("extensions.memoryrestart.label"), strings.getString("extensions.memoryrestart.prompt"))) {
+		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+		var showprompt = prefService.getBoolPref("extensions.memoryrestart.showprompt");
+		if (showprompt) {
+			var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
+			var strings = document.getElementById("memoryrestart-strings");
+			
+			if (prompts.confirm(window, strings.getString("extensions.memoryrestart.label"), strings.getString("extensions.memoryrestart.prompt"))) {
+				this.quit();
+			}
+		} else {
 			this.quit();
 		}
 	},

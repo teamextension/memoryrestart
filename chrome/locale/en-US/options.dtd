@@ -4,4 +4,5 @@
 <!ENTITY colorabovelimit.label "Text color when memory is above threshold">
 <!ENTITY colorbelowlimit.label "Text color when memory is below threshold">
 <!ENTITY autorestart.label "Restart Firefox automatically?">
+<!ENTITY showprompt.label "Show Prompt?">
 
