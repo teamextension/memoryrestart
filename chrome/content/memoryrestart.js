@@ -158,7 +158,8 @@ TeamEXtension.MemoryRestart = {
 		if (canceled.data) return; // somebody canceled our quit request
 
 		var appStartup = Cc['@mozilla.org/toolkit/app-startup;1'].getService(Ci.nsIAppStartup);
-		appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eAttemptQuit);
+		//appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eAttemptQuit);
+		appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eForceQuit);
 
 		// Firefox 4
 		// Components.utils.import("resource://gre/modules/Services.jsm");
