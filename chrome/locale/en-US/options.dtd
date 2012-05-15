@@ -5,4 +5,5 @@
 <!ENTITY colorbelowlimit.label "Text color when memory is below threshold">
 <!ENTITY autorestart.label "Restart Firefox automatically?">
 <!ENTITY showprompt.label "Show prompt on manual restart?">
+<!ENTITY refreshinterval.label "Refresh interval (seconds)">
 

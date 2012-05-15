@@ -2,13 +2,20 @@ if ("undefined" == typeof(TeamEXtension)) {
 	var TeamEXtension = {};
 };
 
+TeamEXtension.intervalId;
+
 TeamEXtension.MemoryRestart = {
 	onLoad: function() {
+		var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService).getBranch("extensions.memoryrestart.");
+		prefs.QueryInterface(Ci.nsIPrefBranch2);
+		prefs.addObserver("", this, false);
+		
 		try {
             Components.utils.import("resource://gre/modules/AddonManager.jsm");
             this.listener = {
                 onUninstalling: function onUninstalling(addon) {
                     TeamEXtension.MemoryRestart.prefCleanUp(addon);
+                    prefs.removeObserver("", this);
                 },
             };   
             AddonManager.addAddonListener(this.listener); 
@@ -16,6 +23,7 @@ TeamEXtension.MemoryRestart = {
             this.installListener = {
         		onInstallEnded: function (install, addon) {
         			TeamEXtension.MemoryRestart.prefCleanUp(addon);
+        			prefs.removeObserver("", this);
                 },
         	};
             AddonManager.addInstallListener(this.installListener);
@@ -30,11 +38,11 @@ TeamEXtension.MemoryRestart = {
 
 		this.checkVersion();
 		
-		var interval = 1*60*1000; // 1 minute
-		// var interval = 5*1*1000; // 5 seconds
-
+		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+		var refreshInterval = prefService.getIntPref("extensions.memoryrestart.refreshinterval");
+				
 		this.refreshMemory();
-		window.setInterval(this.refreshMemory, interval);
+		TeamEXtension.intervalId = window.setInterval(this.refreshMemory, refreshInterval * 1000);
 	},
 	
 	refreshMemory: function()
@@ -101,7 +109,8 @@ TeamEXtension.MemoryRestart = {
 				if (canceled.data) return; // somebody canceled our quit request
 
 				var appStartup = Cc['@mozilla.org/toolkit/app-startup;1'].getService(Ci.nsIAppStartup);
-				appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eAttemptQuit);
+				//appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eAttemptQuit);
+				appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eForceQuit);
 			} else {
 				var colorAboveLimit = prefService.getCharPref("extensions.memoryrestart.colorabovelimit");
 				memoryrestartPanel.style.color = colorAboveLimit;
@@ -220,6 +229,18 @@ TeamEXtension.MemoryRestart = {
 			var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
 			prefService.setCharPref("extensions.memoryrestart.version", '0');
 		}
+	},
+	
+	observe: function(subject, topic, data) {
+		if (topic != "nsPref:changed") {
+			return;
+		}
+		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+		var refreshInterval = prefService.getIntPref("extensions.memoryrestart.refreshinterval");
+		
+		this.refreshMemory();
+		window.clearInterval(TeamEXtension.intervalId);
+		TeamEXtension.intervalId = window.setInterval(this.refreshMemory, refreshInterval * 1000);
 	}
 };
 

@@ -9,6 +9,7 @@
       <preference id="colorbelowlimit" name="extensions.memoryrestart.colorbelowlimit" type="string"/>
       <preference id="autorestart" name="extensions.memoryrestart.autorestart" type="bool"/>
       <preference id="showprompt" name="extensions.memoryrestart.showprompt" type="bool"/>
+      <preference id="refreshinterval" name="extensions.memoryrestart.refreshinterval" type="int"/>
     </preferences>
 	<grid>
 	  <columns>
@@ -28,6 +29,10 @@
 	    <row>
 		    <label control="textcolorbelowlimit">&colorbelowlimit.label;</label>
 		    <textbox id="textcolorbelowlimit" preference="colorbelowlimit" size="10" maxlength="10" />
+	    </row>
+	    <row>
+		    <label control="textrefreshinterval">&refreshinterval.label;</label>
+		    <textbox id="textrefreshinterval" preference="refreshinterval" size="10" maxlength="10" />
 	    </row>
 	    <hbox>
 	    	<checkbox id="autorestart" preference="autorestart"/>
