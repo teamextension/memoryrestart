@@ -1,5 +1,6 @@
 pref("extensions.memoryrestart.version", "0");
-pref("extensions.memoryrestart.memorylimit", 500);
+pref("extensions.memoryrestart.memorylimit", 250);
+pref("extensions.memoryrestart.minimummemorylimit", 250);
 pref("extensions.memoryrestart.colorabovelimit", "red");
 pref("extensions.memoryrestart.colorbelowlimit", "black");
 pref("extensions.memoryrestart.autorestart", false);

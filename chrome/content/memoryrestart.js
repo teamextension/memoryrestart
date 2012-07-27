@@ -11,26 +11,25 @@ TeamEXtension.MemoryRestart = {
 		prefs.addObserver("", this, false);
 		
 		try {
-            Components.utils.import("resource://gre/modules/AddonManager.jsm");
-            this.listener = {
-                onUninstalling: function onUninstalling(addon) {
-                    TeamEXtension.MemoryRestart.prefCleanUp(addon);
-                    prefs.removeObserver("", this);
-                },
-            };   
-            AddonManager.addAddonListener(this.listener); 
-            
-            this.installListener = {
-        		onInstallEnded: function (install, addon) {
-        			TeamEXtension.MemoryRestart.prefCleanUp(addon);
-        			prefs.removeObserver("", this);
-                },
-        	};
-            AddonManager.addInstallListener(this.installListener);
-        }
-        catch(e) {
-        	//observerService.addObserver(this, "em-action-requested", false);
-        }    
+			Components.utils.import("resource://gre/modules/AddonManager.jsm");
+			this.listener = {
+				onUninstalling: function onUninstalling(addon) {
+					TeamEXtension.MemoryRestart.prefCleanUp(addon);
+					prefs.removeObserver("", this);
+				},
+			};
+			AddonManager.addAddonListener(this.listener); 
+
+			this.installListener = {
+				onInstallEnded: function (install, addon) {
+					TeamEXtension.MemoryRestart.prefCleanUp(addon);
+					prefs.removeObserver("", this);
+				},
+			};
+			AddonManager.addInstallListener(this.installListener);
+		} catch(e) {
+			//observerService.addObserver(this, "em-action-requested", false);
+		}
 		
 		if (this.firstRun()) {
 			this.addToolbarButton();
@@ -42,7 +41,7 @@ TeamEXtension.MemoryRestart = {
 		var refreshInterval = prefService.getIntPref("extensions.memoryrestart.refreshinterval");
 				
 		this.refreshMemory();
-		TeamEXtension.intervalId = window.setInterval(this.refreshMemory, refreshInterval * 1000);
+		TeamEXtension.intervalId = window.setInterval(function() { this.refreshMemory() }, refreshInterval * 1000);
 	},
 	
 	refreshMemory: function()
@@ -91,13 +90,13 @@ TeamEXtension.MemoryRestart = {
 		var memoryrestartToolbar = document.getElementById('memoryrestart-button');
 		var memoryrestartPanel = document.getElementById('memoryrestart-panel');
 		
-		var memoryUsedInMb = memoryUsed / (1024 * 1024);
-		memoryUsedInMb = memoryUsedInMb.toFixed();
-		memoryrestartPanel.label = memoryUsedInMb + "Mb";
+		var memoryUsedInMB = memoryUsed / (1024 * 1024);
+		memoryUsedInMB = memoryUsedInMB.toFixed();
+		memoryrestartPanel.label = memoryUsedInMB + "MB";
 
 		var strings = document.getElementById("memoryrestart-strings");
 		var memoryLimit = prefService.getIntPref("extensions.memoryrestart.memorylimit");
-		if (memoryLimit < memoryUsedInMb) {
+		if (memoryLimit < memoryUsedInMB) {
 			var autoRestart = prefService.getBoolPref("extensions.memoryrestart.autorestart");
 			if (autoRestart) {
 				// this.quit is not a function
@@ -117,7 +116,7 @@ TeamEXtension.MemoryRestart = {
 				memoryrestartPanel.tooltipText = strings.getString("extensions.memoryrestart.tooltip.high");
 				if (memoryrestartToolbar != null) {
 					memoryrestartToolbar.style.listStyleImage = "url('chrome://memoryrestart/skin/above16.png')";
-					memoryrestartToolbar.tooltipText = memoryUsedInMb + "Mb";
+					memoryrestartToolbar.tooltipText = memoryUsedInMB + "MB";
 				}
 			}
 		} else {
@@ -126,7 +125,7 @@ TeamEXtension.MemoryRestart = {
 			memoryrestartPanel.tooltipText = strings.getString("extensions.memoryrestart.tooltip.normal");
 			if (memoryrestartToolbar != null) {
 				memoryrestartToolbar.style.listStyleImage = "url('chrome://memoryrestart/skin/below16.png')";
-				memoryrestartToolbar.tooltipText = memoryUsedInMb + "Mb";
+				memoryrestartToolbar.tooltipText = memoryUsedInMB + "MB";
 			}
 		}
 	},
@@ -167,8 +166,8 @@ TeamEXtension.MemoryRestart = {
 		if (canceled.data) return; // somebody canceled our quit request
 
 		var appStartup = Cc['@mozilla.org/toolkit/app-startup;1'].getService(Ci.nsIAppStartup);
-		//appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eAttemptQuit);
-		appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eForceQuit);
+		appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eAttemptQuit);
+		//appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eForceQuit);
 
 		// Firefox 4
 		// Components.utils.import("resource://gre/modules/Services.jsm");
@@ -240,7 +239,7 @@ TeamEXtension.MemoryRestart = {
 		
 		this.refreshMemory();
 		window.clearInterval(TeamEXtension.intervalId);
-		TeamEXtension.intervalId = window.setInterval(this.refreshMemory, refreshInterval * 1000);
+		TeamEXtension.intervalId = window.setInterval(function() { this.refreshMemory() }, refreshInterval * 1000);
 	}
 };
 

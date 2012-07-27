@@ -2,17 +2,24 @@
 <!DOCTYPE overlay SYSTEM "chrome://memoryrestart/locale/memoryrestart.dtd">
 <?xml-stylesheet href="chrome://memoryrestart/skin/toolbar.css" type="text/css"?>
 <overlay id="memoryrestart-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <script src="memoryrestart.js"/>
+	
+	<script src="memoryrestart.js"/>
 
-  <stringbundleset id="stringbundleset">
-    <stringbundle id="memoryrestart-strings" src="chrome://memoryrestart/locale/memoryrestart.properties"/>
-  </stringbundleset>
+	<stringbundleset id="stringbundleset">
+		<stringbundle id="memoryrestart-strings" src="chrome://memoryrestart/locale/memoryrestart.properties"/>
+	</stringbundleset>
 
-  <toolbarpalette id="BrowserToolbarPalette">
-    <toolbarbutton id="memoryrestart-button" class="toolbarbutton-1" label="&toolbar.label;" tooltiptext="&toolbar.tooltip;" oncommand="TeamEXtension.MemoryRestart.restartFirefox()" />
-  </toolbarpalette>
-  
-  <statusbar id="status-bar">
-    <statusbarpanel id="memoryrestart-panel" onclick="TeamEXtension.MemoryRestart.restartFirefox()" />
-  </statusbar>
+	<menupopup id="menu_FilePopup">
+		<menuitem id="menu_restart" label="&menu.file.restart.label;" insertbefore="menu_newNavigatorTab" oncommand="TeamEXtension.MemoryRestart.restartFirefox()" />
+		<menuseparator insertafter="menu_restart" />
+	</menupopup>
+	
+	<toolbarpalette id="BrowserToolbarPalette">
+		<toolbarbutton id="memoryrestart-button" class="toolbarbutton-1" label="&toolbar.label;" tooltiptext="&toolbar.tooltip;" oncommand="TeamEXtension.MemoryRestart.restartFirefox()" />
+	</toolbarpalette>
+
+	<statusbar id="status-bar">
+		<statusbarpanel id="memoryrestart-panel" onclick="TeamEXtension.MemoryRestart.restartFirefox()" />
+	</statusbar>
+	
 </overlay>
