@@ -4,6 +4,7 @@ pref("extensions.memoryrestart.minimummemorylimit", 250);
 pref("extensions.memoryrestart.colorabovelimit", "red");
 pref("extensions.memoryrestart.colorbelowlimit", "black");
 pref("extensions.memoryrestart.autorestart", false);
+pref("extensions.memoryrestart.autorestart.delay", 60);
 pref("extensions.memoryrestart.showprompt", true);
 pref("extensions.memoryrestart.refreshinterval", 60);
 

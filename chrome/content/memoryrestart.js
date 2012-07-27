@@ -97,27 +97,23 @@ TeamEXtension.MemoryRestart = {
 		var strings = document.getElementById("memoryrestart-strings");
 		var memoryLimit = prefService.getIntPref("extensions.memoryrestart.memorylimit");
 		if (memoryLimit < memoryUsedInMB) {
+			var colorAboveLimit = prefService.getCharPref("extensions.memoryrestart.colorabovelimit");
+			memoryrestartPanel.style.color = colorAboveLimit;
+			memoryrestartPanel.tooltipText = strings.getString("extensions.memoryrestart.tooltip.high");
+			if (memoryrestartToolbar != null) {
+				memoryrestartToolbar.style.listStyleImage = "url('chrome://memoryrestart/skin/above16.png')";
+				memoryrestartToolbar.tooltipText = memoryUsedInMB + "MB";
+			}
 			var autoRestart = prefService.getBoolPref("extensions.memoryrestart.autorestart");
 			if (autoRestart) {
-				// this.quit is not a function
-				// this.quit();
 				var observerService = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 				var canceled = Cc["@mozilla.org/supports-PRBool;1"].createInstance(Ci.nsISupportsPRBool);
 				observerService.notifyObservers(canceled, "quit-application-requested", "restart");
 				 
 				if (canceled.data) return; // somebody canceled our quit request
 
-				var appStartup = Cc['@mozilla.org/toolkit/app-startup;1'].getService(Ci.nsIAppStartup);
-				//appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eAttemptQuit);
-				appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eForceQuit);
-			} else {
-				var colorAboveLimit = prefService.getCharPref("extensions.memoryrestart.colorabovelimit");
-				memoryrestartPanel.style.color = colorAboveLimit;
-				memoryrestartPanel.tooltipText = strings.getString("extensions.memoryrestart.tooltip.high");
-				if (memoryrestartToolbar != null) {
-					memoryrestartToolbar.style.listStyleImage = "url('chrome://memoryrestart/skin/above16.png')";
-					memoryrestartToolbar.tooltipText = memoryUsedInMB + "MB";
-				}
+				var autoRestartDelay = prefService.getIntPref("extensions.memoryrestart.autorestart.delay");
+				window.setTimeout(function() { TeamEXtension.MemoryRestart.restartAPI(); }, autoRestartDelay * 1000);
 			}
 		} else {
 			var colorBelowLimit = prefService.getCharPref("extensions.memoryrestart.colorbelowlimit");
@@ -145,6 +141,20 @@ TeamEXtension.MemoryRestart = {
 			this.quit();
 		}
 	},
+	
+	restartAPI: function()
+	{
+		var appStartup = Cc['@mozilla.org/toolkit/app-startup;1'].getService(Ci.nsIAppStartup);
+		appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eAttemptQuit);
+		//appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eForceQuit);
+		
+		// Firefox 4
+		// Components.utils.import("resource://gre/modules/Services.jsm");
+		// if (Services.wm.getMostRecentWindow("navigator:browser").canQuitApplication()) {
+		//     var appStartup = Cc['@mozilla.org/toolkit/app-startup;1'].getService(Ci.nsIAppStartup);
+		//     appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eAttemptQuit);
+		// }
+	},
 
 	logToConsole: function(message)
 	{
@@ -165,16 +175,7 @@ TeamEXtension.MemoryRestart = {
 		 
 		if (canceled.data) return; // somebody canceled our quit request
 
-		var appStartup = Cc['@mozilla.org/toolkit/app-startup;1'].getService(Ci.nsIAppStartup);
-		appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eAttemptQuit);
-		//appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eForceQuit);
-
-		// Firefox 4
-		// Components.utils.import("resource://gre/modules/Services.jsm");
-		// if (Services.wm.getMostRecentWindow("navigator:browser").canQuitApplication()) {
-		//     var appStartup = Cc['@mozilla.org/toolkit/app-startup;1'].getService(Ci.nsIAppStartup);
-		//     appStartup.quit(Ci.nsIAppStartup.eRestart | Ci.nsIAppStartup.eAttemptQuit);
-		// }
+		this.restartAPI();
 	},
 
 	addToolbarButton: function() {
