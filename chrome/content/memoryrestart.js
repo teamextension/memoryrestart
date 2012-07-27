@@ -41,7 +41,7 @@ TeamEXtension.MemoryRestart = {
 		var refreshInterval = prefService.getIntPref("extensions.memoryrestart.refreshinterval");
 				
 		this.refreshMemory();
-		TeamEXtension.intervalId = window.setInterval(function() { this.refreshMemory() }, refreshInterval * 1000);
+		TeamEXtension.intervalId = window.setInterval(function() { TeamEXtension.MemoryRestart.refreshMemory(); }, refreshInterval * 1000);
 	},
 	
 	refreshMemory: function()
@@ -239,7 +239,7 @@ TeamEXtension.MemoryRestart = {
 		
 		this.refreshMemory();
 		window.clearInterval(TeamEXtension.intervalId);
-		TeamEXtension.intervalId = window.setInterval(function() { this.refreshMemory() }, refreshInterval * 1000);
+		TeamEXtension.intervalId = window.setInterval(function() { TeamEXtension.MemoryRestart.refreshMemory(); }, refreshInterval * 1000);
 	}
 };
 
