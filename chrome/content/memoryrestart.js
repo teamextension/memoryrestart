@@ -4,6 +4,8 @@ if ("undefined" == typeof(TeamEXtension)) {
 
 TeamEXtension.intervalId;
 
+TeamEXtension.minimizeMemoryUsageCaller = false;
+
 TeamEXtension.MemoryRestart = {
 	onLoad: function() {
 		var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService).getBranch("extensions.memoryrestart.");
@@ -46,6 +48,53 @@ TeamEXtension.MemoryRestart = {
 	
 	refreshMemory: function()
 	{
+		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);		
+		var memoryUsedInMB = this.getMemoryUsedInMB();		
+		var memoryrestartToolbar = document.getElementById('memoryrestart-button');
+		var memoryrestartPanel = document.getElementById('memoryrestart-panel');
+		memoryrestartPanel.label = memoryUsedInMB + "MB";
+		var strings = document.getElementById("memoryrestart-strings");
+		var memoryLimit = prefService.getIntPref("extensions.memoryrestart.memorylimit");
+		if (memoryLimit < memoryUsedInMB) {
+			var colorAboveLimit = prefService.getCharPref("extensions.memoryrestart.colorabovelimit");
+			memoryrestartPanel.style.color = colorAboveLimit;
+			memoryrestartPanel.tooltipText = strings.getString("extensions.memoryrestart.tooltip.high");
+			if (memoryrestartToolbar != null) {
+				memoryrestartToolbar.style.listStyleImage = "url('chrome://memoryrestart/skin/above16.png')";
+				memoryrestartToolbar.tooltipText = memoryUsedInMB + "MB";
+			}
+			// notify to clear some memory first, then call refreshMemory()
+			if (TeamEXtension.minimizeMemoryUsageCaller == false) {
+				TeamEXtension.minimizeMemoryUsageCaller = true; 
+				//this.minimizeMemoryUsage3x(function() { TeamEXtension.MemoryRestart.refreshMemory(); }, memoryUsedInMB);
+				this.minimizeMemory(memoryUsedInMB);
+			} else { // act as a callback of minimizeMemoryUsage3x when the indicator minimizeMemoryUsageCaller is set to false
+				TeamEXtension.minimizeMemoryUsageCaller = false;
+				var autoRestart = prefService.getBoolPref("extensions.memoryrestart.autorestart");
+				if (autoRestart) {
+					var observerService = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+					var canceled = Cc["@mozilla.org/supports-PRBool;1"].createInstance(Ci.nsISupportsPRBool);
+					observerService.notifyObservers(canceled, "quit-application-requested", "restart");
+					 
+					if (canceled.data) return; // somebody canceled our quit request
+	
+					var autoRestartDelay = prefService.getIntPref("extensions.memoryrestart.autorestart.delay");
+					window.setTimeout(function() { TeamEXtension.MemoryRestart.restartAPI(); }, autoRestartDelay * 1000);
+				}				
+			}
+		} else {
+			TeamEXtension.minimizeMemoryUsageCaller = false;
+			var colorBelowLimit = prefService.getCharPref("extensions.memoryrestart.colorbelowlimit");
+			memoryrestartPanel.style.color = colorBelowLimit;
+			memoryrestartPanel.tooltipText = strings.getString("extensions.memoryrestart.tooltip.normal");
+			if (memoryrestartToolbar != null) {
+				memoryrestartToolbar.style.listStyleImage = "url('chrome://memoryrestart/skin/below16.png')";
+				memoryrestartToolbar.tooltipText = memoryUsedInMB + "MB";
+			}			
+		}
+	},
+	
+	getMemoryUsedInMB: function() {
 		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
 		var memoryReporterManager = Cc["@mozilla.org/memory-reporter-manager;1"].getService(Ci.nsIMemoryReporterManager);
 		
@@ -86,44 +135,8 @@ TeamEXtension.MemoryRestart = {
 				check_private = false;
 			}
 		}
-
-		var memoryrestartToolbar = document.getElementById('memoryrestart-button');
-		var memoryrestartPanel = document.getElementById('memoryrestart-panel');
-		
 		var memoryUsedInMB = memoryUsed / (1024 * 1024);
-		memoryUsedInMB = memoryUsedInMB.toFixed();
-		memoryrestartPanel.label = memoryUsedInMB + "MB";
-
-		var strings = document.getElementById("memoryrestart-strings");
-		var memoryLimit = prefService.getIntPref("extensions.memoryrestart.memorylimit");
-		if (memoryLimit < memoryUsedInMB) {
-			var colorAboveLimit = prefService.getCharPref("extensions.memoryrestart.colorabovelimit");
-			memoryrestartPanel.style.color = colorAboveLimit;
-			memoryrestartPanel.tooltipText = strings.getString("extensions.memoryrestart.tooltip.high");
-			if (memoryrestartToolbar != null) {
-				memoryrestartToolbar.style.listStyleImage = "url('chrome://memoryrestart/skin/above16.png')";
-				memoryrestartToolbar.tooltipText = memoryUsedInMB + "MB";
-			}
-			var autoRestart = prefService.getBoolPref("extensions.memoryrestart.autorestart");
-			if (autoRestart) {
-				var observerService = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-				var canceled = Cc["@mozilla.org/supports-PRBool;1"].createInstance(Ci.nsISupportsPRBool);
-				observerService.notifyObservers(canceled, "quit-application-requested", "restart");
-				 
-				if (canceled.data) return; // somebody canceled our quit request
-
-				var autoRestartDelay = prefService.getIntPref("extensions.memoryrestart.autorestart.delay");
-				window.setTimeout(function() { TeamEXtension.MemoryRestart.restartAPI(); }, autoRestartDelay * 1000);
-			}
-		} else {
-			var colorBelowLimit = prefService.getCharPref("extensions.memoryrestart.colorbelowlimit");
-			memoryrestartPanel.style.color = colorBelowLimit;
-			memoryrestartPanel.tooltipText = strings.getString("extensions.memoryrestart.tooltip.normal");
-			if (memoryrestartToolbar != null) {
-				memoryrestartToolbar.style.listStyleImage = "url('chrome://memoryrestart/skin/below16.png')";
-				memoryrestartToolbar.tooltipText = memoryUsedInMB + "MB";
-			}
-		}
+		return memoryUsedInMB.toFixed();
 	},
 
 	restartFirefox: function()
@@ -241,6 +254,33 @@ TeamEXtension.MemoryRestart = {
 		this.refreshMemory();
 		window.clearInterval(TeamEXtension.intervalId);
 		TeamEXtension.intervalId = window.setInterval(function() { TeamEXtension.MemoryRestart.refreshMemory(); }, refreshInterval * 1000);
+	},
+	
+	// based on chrome://global/content/aboutMemory.js at page about:memory
+	// For maximum effect, this returns to the event loop between each
+	// notification.  See bug 610166 comment 12 for an explanation.
+	// Ideally a single notification would be enough.
+	minimizeMemoryUsage3x: function(fAfter, pMem) {
+		var i = 0;
+
+		function runSoon(f) {
+			var tm = Cc["@mozilla.org/thread-manager;1"].getService(Ci.nsIThreadManager);
+			tm.mainThread.dispatch({ run: f }, Ci.nsIThread.DISPATCH_NORMAL);
+		}
+
+		function sendHeapMinNotificationsInner() {
+			var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+			// https://developer.mozilla.org/en/XPCOM_Interface_Reference/nsIMemory#Low_memory_notifications
+			os.notifyObservers(null, "memory-pressure", "heap-minimize");
+			if (++i < 3) {
+				runSoon(sendHeapMinNotificationsInner);
+			} else {
+				//alert('sendHeapMinNotificationsInner '+pMem + '>' + TeamEXtension.MemoryRestart.getMemoryUsedInMB());
+				runSoon(fAfter);
+			}	
+		}
+		
+		sendHeapMinNotificationsInner();
 	}
 };
 
