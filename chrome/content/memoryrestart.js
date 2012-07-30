@@ -66,8 +66,7 @@ TeamEXtension.MemoryRestart = {
 			// notify to clear some memory first, then call refreshMemory()
 			if (TeamEXtension.minimizeMemoryUsageCaller == false) {
 				TeamEXtension.minimizeMemoryUsageCaller = true; 
-				//this.minimizeMemoryUsage3x(function() { TeamEXtension.MemoryRestart.refreshMemory(); }, memoryUsedInMB);
-				this.minimizeMemory(memoryUsedInMB);
+				this.minimizeMemoryUsage3x(function() { TeamEXtension.MemoryRestart.refreshMemory(); }, memoryUsedInMB);
 			} else { // act as a callback of minimizeMemoryUsage3x when the indicator minimizeMemoryUsageCaller is set to false
 				TeamEXtension.minimizeMemoryUsageCaller = false;
 				var autoRestart = prefService.getBoolPref("extensions.memoryrestart.autorestart");
