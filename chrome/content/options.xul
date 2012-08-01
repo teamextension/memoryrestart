@@ -20,6 +20,7 @@
 			<preference id="autorestart" name="extensions.memoryrestart.autorestart" type="bool"/>
 			<preference id="showprompt" name="extensions.memoryrestart.showprompt" type="bool"/>
 			<preference id="refreshinterval" name="extensions.memoryrestart.refreshinterval" type="int"/>
+			<preference id="minimizememory" name="extensions.memoryrestart.minimizememory" type="bool"/>
 		</preferences>
 		<grid>
 			<rows>
@@ -46,6 +47,10 @@
 				<hbox>
 					<checkbox id="showprompt" preference="showprompt"/>
 					<label control="showprompt">&showprompt.label;</label>
+				</hbox>
+				<hbox>
+					<checkbox id="minimizememory" preference="minimizememory"/>
+					<label control="minimizememory">&minimizememory.label;</label>
 				</hbox>
 				<row style="height: 5px;">
 					<font id="error_memorylimit" style="display: none;">&memorylimit.error;</font>

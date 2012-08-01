@@ -63,11 +63,17 @@ TeamEXtension.MemoryRestart = {
 				memoryrestartToolbar.style.listStyleImage = "url('chrome://memoryrestart/skin/above16.png')";
 				memoryrestartToolbar.tooltipText = memoryUsedInMB + "MB";
 			}
+			var minimizeMemory = prefService.getBoolPref("extensions.memoryrestart.minimizememory");
 			// notify to clear some memory first, then call refreshMemory()
-			if (TeamEXtension.minimizeMemoryUsageCaller == false) {
+			if (minimizeMemory && TeamEXtension.minimizeMemoryUsageCaller == false) {
 				TeamEXtension.minimizeMemoryUsageCaller = true; 
 				this.minimizeMemoryUsage3x(function() { TeamEXtension.MemoryRestart.refreshMemory(); }, memoryUsedInMB);
 			} else { // act as a callback of minimizeMemoryUsage3x when the indicator minimizeMemoryUsageCaller is set to false
+				if (minimizeMemory) {
+					var msgMemory = "Memory minimized to " + memoryUsedInMB + "MB";
+					memoryrestartPanel.label = msgMemory;
+					memoryrestartToolbar.tooltipText = msgMemory;
+				}				
 				TeamEXtension.minimizeMemoryUsageCaller = false;
 				var autoRestart = prefService.getBoolPref("extensions.memoryrestart.autorestart");
 				if (autoRestart) {

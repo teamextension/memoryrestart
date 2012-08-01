@@ -7,4 +7,5 @@
 <!ENTITY showprompt.label "Show prompt on manual restart?">
 <!ENTITY refreshinterval.label "Refresh interval (seconds)">
 <!ENTITY memorylimit.error "Minimum of 250MB is allowed">
+<!ENTITY minimizememory.label "Minimize memory when threshold reached">
 
