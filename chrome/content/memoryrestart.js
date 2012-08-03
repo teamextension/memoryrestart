@@ -51,6 +51,7 @@ TeamEXtension.MemoryRestart = {
 		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);		
 		var memoryUsedInMB = this.getMemoryUsedInMB();		
 		var memoryrestartToolbar = document.getElementById('memoryrestart-button');
+		var memoryrestartButtonTt = document.getElementById('memoryrestart-button-tt');
 		var memoryrestartPanel = document.getElementById('memoryrestart-panel');
 		memoryrestartPanel.label = memoryUsedInMB + "MB";
 		var strings = document.getElementById("memoryrestart-strings");
@@ -61,7 +62,7 @@ TeamEXtension.MemoryRestart = {
 			memoryrestartPanel.tooltipText = strings.getString("extensions.memoryrestart.tooltip.high");
 			if (memoryrestartToolbar != null) {
 				memoryrestartToolbar.style.listStyleImage = "url('chrome://memoryrestart/skin/above16.png')";
-				memoryrestartToolbar.tooltipText = memoryUsedInMB + "MB";
+				memoryrestartButtonTt.label = memoryUsedInMB + "MB";
 			}
 			var minimizeMemory = prefService.getBoolPref("extensions.memoryrestart.minimizememory");
 			// notify to clear some memory first, then call refreshMemory()
@@ -72,7 +73,13 @@ TeamEXtension.MemoryRestart = {
 				if (minimizeMemory) {
 					var msgMemory = "Memory minimized to " + memoryUsedInMB + "MB";
 					memoryrestartPanel.label = msgMemory;
-					memoryrestartToolbar.tooltipText = msgMemory;
+					memoryrestartButtonTt.label = msgMemory;
+					//relative to something, will display all over the place, solution is just to make coordinate fix
+					//var x = memoryrestartButtonTt.popupBoxObject.x;
+					//var y = memoryrestartButtonTt.popupBoxObject.y;
+					var x = 15;
+					var y = -15;
+					memoryrestartButtonTt.openPopup(memoryrestartToolbar, "after_start", x, y, false, false);
 				}				
 				TeamEXtension.minimizeMemoryUsageCaller = false;
 				var autoRestart = prefService.getBoolPref("extensions.memoryrestart.autorestart");
@@ -94,7 +101,7 @@ TeamEXtension.MemoryRestart = {
 			memoryrestartPanel.tooltipText = strings.getString("extensions.memoryrestart.tooltip.normal");
 			if (memoryrestartToolbar != null) {
 				memoryrestartToolbar.style.listStyleImage = "url('chrome://memoryrestart/skin/below16.png')";
-				memoryrestartToolbar.tooltipText = memoryUsedInMB + "MB";
+				memoryrestartButtonTt.label = memoryUsedInMB + "MB";
 			}			
 		}
 	},

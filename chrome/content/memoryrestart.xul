@@ -17,8 +17,12 @@
 		<menuitem id="appmenu-restart" label="&menu.file.restart.label;" insertbefore="appmenu-quit" oncommand="TeamEXtension.MemoryRestart.restartFirefox()" class="menuitem-iconic"/>
 	</vbox>
 	
+	<popupset> 
+		<tooltip id="memoryrestart-button-tt" label="&toolbar.tooltip;"/>
+	</popupset> 
+	
 	<toolbarpalette id="BrowserToolbarPalette">
-		<toolbarbutton id="memoryrestart-button" class="toolbarbutton-1" label="&toolbar.label;" tooltiptext="&toolbar.tooltip;" oncommand="TeamEXtension.MemoryRestart.restartFirefox()" />
+		<toolbarbutton id="memoryrestart-button" class="toolbarbutton-1" label="&toolbar.label;" tooltip="memoryrestart-button-tt" oncommand="TeamEXtension.MemoryRestart.restartFirefox()" />
 	</toolbarpalette>
 
 	<statusbar id="status-bar">
