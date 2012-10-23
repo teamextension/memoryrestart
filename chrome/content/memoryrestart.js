@@ -70,10 +70,9 @@ TeamEXtension.MemoryRestart = {
 				TeamEXtension.minimizeMemoryUsageCaller = true; 
 				this.minimizeMemoryUsage3x(function() { TeamEXtension.MemoryRestart.refreshMemory(); }, memoryUsedInMB);
 			} else { // act as a callback of minimizeMemoryUsage3x when the indicator minimizeMemoryUsageCaller is set to false
+				memoryrestartPanel.label = memoryUsedInMB + "MB";
 				if (minimizeMemory) {
-					var msgMemory = "Memory minimized to " + memoryUsedInMB + "MB";
-					memoryrestartPanel.label = msgMemory;
-					memoryrestartButtonTt.label = msgMemory;
+					memoryrestartButtonTt.label = "Memory minimized to " + memoryUsedInMB + "MB";
 					//relative to something, will display all over the place, solution is just to make coordinate fix
 					//var x = memoryrestartButtonTt.popupBoxObject.x;
 					//var y = memoryrestartButtonTt.popupBoxObject.y;

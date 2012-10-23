@@ -1,62 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <!DOCTYPE prefwindow SYSTEM "chrome://memoryrestart/locale/options.dtd">
-<prefwindow id="memoryrestart-preferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" title="&prefwindow.title;"
-	onload="TeamEXtension.MemoryRestartOptions.onLoad();"
-	ondialogaccept="return TeamEXtension.MemoryRestartOptions.onDialogAccept();"
-	ondialogcancel="return TeamEXtension.MemoryRestartOptions.onDialogCancel();">
+<prefwindow id="memoryrestart-preferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" title="&prefwindow.title;">
+  <prefpane id="pane1" label="&pane1.title;">
+    <preferences>
+      <preference id="memorylimit" name="extensions.memoryrestart.memorylimit" type="int"/>
+      <preference id="colorabovelimit" name="extensions.memoryrestart.colorabovelimit" type="string"/>
+      <preference id="colorbelowlimit" name="extensions.memoryrestart.colorbelowlimit" type="string"/>
+      <preference id="autorestart" name="extensions.memoryrestart.autorestart" type="bool"/>
+      <preference id="showprompt" name="extensions.memoryrestart.showprompt" type="bool"/>
+      <preference id="refreshinterval" name="extensions.memoryrestart.refreshinterval" type="int"/>
+      <preference id="minimizememory" name="extensions.memoryrestart.minimizememory" type="bool"/>
+    </preferences>
+	<grid>
+	  <columns>
+	    <column />
+	    <column />
+	  </columns>
 	
-	<script src="options.js"/>
-	
-	<stringbundleset id="stringbundleset">
-		<stringbundle id="memoryrestart-strings" src="chrome://memoryrestart/locale/memoryrestart.properties"/>
-	</stringbundleset>
-		
-	<prefpane id="pane1" label="&pane1.title;">
-		<preferences>
-			<preference id="memorylimit" name="extensions.memoryrestart.memorylimit" type="int"/>
-			<preference id="colorabovelimit" name="extensions.memoryrestart.colorabovelimit" type="string"/>
-			<preference id="colorbelowlimit" name="extensions.memoryrestart.colorbelowlimit" type="string"/>
-			<preference id="autorestart" name="extensions.memoryrestart.autorestart" type="bool"/>
-			<preference id="showprompt" name="extensions.memoryrestart.showprompt" type="bool"/>
-			<preference id="refreshinterval" name="extensions.memoryrestart.refreshinterval" type="int"/>
-			<preference id="minimizememory" name="extensions.memoryrestart.minimizememory" type="bool"/>
-		</preferences>
-		<grid>
-			<rows>
-				<row>
-					<label control="textmemorylimit">&memorylimit.label;</label>
-					<textbox id="textmemorylimit" preference="memorylimit" size="10" maxlength="10" />
-				</row>
-				<row>
-					<label control="textcolorabovelimit">&colorabovelimit.label;</label>
-					<textbox id="textcolorabovelimit" preference="colorabovelimit" size="10" maxlength="10" />
-				</row>
-				<row>
-					<label control="textcolorbelowlimit">&colorbelowlimit.label;</label>
-					<textbox id="textcolorbelowlimit" preference="colorbelowlimit" size="10" maxlength="10" />
-				</row>
-				<row>
-					<label control="textrefreshinterval">&refreshinterval.label;</label>
-					<textbox id="textrefreshinterval" preference="refreshinterval" size="10" maxlength="10" />
-				</row>
-				<hbox>
-					<checkbox id="autorestart" preference="autorestart"/>
-					<label control="autorestart">&autorestart.label;</label>
-				</hbox>
-				<hbox>
-					<checkbox id="showprompt" preference="showprompt"/>
-					<label control="showprompt">&showprompt.label;</label>
-				</hbox>
-				<hbox>
-					<checkbox id="minimizememory" preference="minimizememory"/>
-					<label control="minimizememory">&minimizememory.label;</label>
-				</hbox>
-				<row style="height: 5px;">
-					<font id="error_memorylimit" style="display: none;">&memorylimit.error;</font>
-				</row>
-			</rows>
-		</grid>
-	</prefpane>
-	
+	  <rows>
+	    <row>
+		    <label control="textmemorylimit">&memorylimit.label;</label>
+		    <textbox id="textmemorylimit" preference="memorylimit" size="10" maxlength="10" />
+	    </row>
+	    <row>
+		    <label control="textcolorabovelimit">&colorabovelimit.label;</label>
+		    <textbox id="textcolorabovelimit" preference="colorabovelimit" size="10" maxlength="10" />
+	    </row>
+	    <row>
+		    <label control="textcolorbelowlimit">&colorbelowlimit.label;</label>
+		    <textbox id="textcolorbelowlimit" preference="colorbelowlimit" size="10" maxlength="10" />
+	    </row>
+	    <row>
+		    <label control="textrefreshinterval">&refreshinterval.label;</label>
+		    <textbox id="textrefreshinterval" preference="refreshinterval" size="10" maxlength="10" />
+	    </row>
+	    <hbox>
+	    	<checkbox id="autorestart" preference="autorestart"/>
+	    	<label control="autorestart">&autorestart.label;</label>
+		</hbox>
+		<hbox>
+	    	<checkbox id="showprompt" preference="showprompt"/>
+	    	<label control="showprompt">&showprompt.label;</label>
+		</hbox>
+		<hbox>
+			<checkbox id="minimizememory" preference="minimizememory"/>
+			<label control="minimizememory">&minimizememory.label;</label>
+		</hbox>
+	  </rows>
+	</grid>
+  </prefpane>
 </prefwindow>
