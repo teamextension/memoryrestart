@@ -71,6 +71,7 @@ TeamEXtension.MemoryRestart = {
 				this.minimizeMemoryUsage3x(function() { TeamEXtension.MemoryRestart.refreshMemory(); }, memoryUsedInMB);
 			} else { // act as a callback of minimizeMemoryUsage3x when the indicator minimizeMemoryUsageCaller is set to false
 				memoryrestartPanel.label = memoryUsedInMB + "MB";
+				/* disable tooltip to notify user after memory is minimized
 				if (minimizeMemory) {
 					memoryrestartButtonTt.label = "Memory minimized to " + memoryUsedInMB + "MB";
 					//relative to something, will display all over the place, solution is just to make coordinate fix
@@ -80,6 +81,7 @@ TeamEXtension.MemoryRestart = {
 					var y = -15;
 					memoryrestartButtonTt.openPopup(memoryrestartToolbar, "after_start", x, y, false, false);
 				}				
+				*/
 				TeamEXtension.minimizeMemoryUsageCaller = false;
 				var autoRestart = prefService.getBoolPref("extensions.memoryrestart.autorestart");
 				if (autoRestart) {
