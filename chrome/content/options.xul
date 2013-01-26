@@ -11,6 +11,7 @@
       <preference id="showprompt" name="extensions.memoryrestart.showprompt" type="bool"/>
       <preference id="refreshinterval" name="extensions.memoryrestart.refreshinterval" type="int"/>
       <preference id="minimizememory" name="extensions.memoryrestart.minimizememory" type="bool"/>
+      <preference id="minimizememorytolerancepercent" name="extensions.memoryrestart.minimizememory.tolerance.percent" type="int"/>
     </preferences>
 	<grid>
 	  <columns>
@@ -47,6 +48,10 @@
 			<checkbox id="minimizememory" preference="minimizememory"/>
 			<label control="minimizememory">&minimizememory.label;</label>
 		</hbox>
+		<row>
+			<label control="minimizememorytolerancepercent">&minimizememorytolerancepercent.label;</label>
+			<textbox id="minimizememorytolerancepercent" preference="minimizememorytolerancepercent" size="10" maxlength="10" />			
+		</row>
 	  </rows>
 	</grid>
   </prefpane>
