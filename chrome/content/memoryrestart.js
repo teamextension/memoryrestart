@@ -8,7 +8,9 @@ TeamEXtension.intervalIdAutoRestart;
 
 TeamEXtension.minimizeMemoryUsageCaller = false;
 
-TeamEXtension.prevMinimizedMemory = -1;
+TeamEXtension.prevMinimizedMemoryTS = -1;
+
+TeamEXtension.prevMemWasBelowThreshold = true;
 
 TeamEXtension.MemoryRestart = {
 	onLoad: function() {
@@ -67,9 +69,10 @@ TeamEXtension.MemoryRestart = {
 				memoryrestartButtonTt.label = memoryUsedInMB + "MB";
 			}
 			var minimizeMemory = prefService.getBoolPref("extensions.memoryrestart.minimizememory");
-			if (minimizeMemory && TeamEXtension.minimizeMemoryUsageCaller == false) {								
-				if (this.isToleranceReached(memoryUsedInMB)) {
-					TeamEXtension.prevMinimizedMemory = memoryUsedInMB;
+			if (minimizeMemory && TeamEXtension.minimizeMemoryUsageCaller == false) {
+				var now = Date.now();
+				if (this.shouldMinimize(now)) {
+					TeamEXtension.prevMinimizedMemoryTS = now;
 					TeamEXtension.minimizeMemoryUsageCaller = true; 
 					this.minimizeMemoryUsage3x(function() { TeamEXtension.MemoryRestart.refreshMemory(); });
 				}
@@ -92,8 +95,8 @@ TeamEXtension.MemoryRestart = {
 					this.quit(autoRestartDelay);
 				}				
 			}
+			TeamEXtension.prevMemWasBelowThreshold = false;			
 		} else {
-			TeamEXtension.prevMinimizedMemory = -1;
 			TeamEXtension.minimizeMemoryUsageCaller = false;
 			var colorBelowLimit = prefService.getCharPref("extensions.memoryrestart.colorbelowlimit");
 			memoryrestartPanel.style.color = colorBelowLimit;
@@ -102,29 +105,28 @@ TeamEXtension.MemoryRestart = {
 				memoryrestartToolbar.style.listStyleImage = "url('chrome://memoryrestart/skin/below16.png')";
 				var memoryrestartButtonTt = document.getElementById('memoryrestart-button-tt');
 				memoryrestartButtonTt.label = memoryUsedInMB + "MB";
-			}			
+			}
+			TeamEXtension.prevMemWasBelowThreshold = true;			
 		}
 	},
 	
-	isToleranceReached: function(currentMemory) {
-		var toleranceReached = false;
-		if (TeamEXtension.prevMinimizedMemory == -1) {
-			toleranceReached = true;
-			//this.logToConsole('memoryrestart.isToleranceReached toleranceReached='+toleranceReached+', negative prev mem');
-		} else {
-			var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);		
-			var tolerancePercent = prefService.getIntPref("extensions.memoryrestart.minimizememory.tolerance.percent");
-			if (tolerancePercent < 0) {
-				tolerancePercent = 10;
-				prefService.setIntPref("extensions.memoryrestart.minimizememory.tolerance.percent", tolerancePercent);
+	shouldMinimize: function(now) {
+		var minimize = false;
+		if (TeamEXtension.prevMemWasBelowThreshold) {
+			if (TeamEXtension.prevMinimizedMemoryTS == -1) {
+				minimize = true;
+				//this.logToConsole('memoryrestart.shouldMinimize minimize='+minimize+', 1st time');
+			} else {
+				var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);		
+				var intervalMins = prefService.getIntPref("extensions.memoryrestart.minimizememory.interval.mins");
+				var gapMins = (now - TeamEXtension.prevMinimizedMemoryTS) / 1000 / 60;
+				minimize = gapMins >= intervalMins;
+				//this.logToConsole('memoryrestart.shouldMinimize '+minimize+' '+intervalMins+' mins prev='+TeamEXtension.prevMinimizedMemoryTS+' now='+now+
+				//		' '+gapMins+' >= '+intervalMins);
 			}
-			var upperTolerance = (TeamEXtension.prevMinimizedMemory * (100 + tolerancePercent) / 100);
-			var lowerTolerance = (TeamEXtension.prevMinimizedMemory * (100 - tolerancePercent) / 100);
-			toleranceReached = currentMemory <= lowerTolerance || currentMemory >= upperTolerance;
-			//this.logToConsole('memoryrestart.isToleranceReached '+toleranceReached+' '+tolerancePercent+'% prev='+TeamEXtension.prevMinimizedMemory+
-			//		' '+currentMemory+' <= '+lowerTolerance+' || '+currentMemory+' >= '+upperTolerance);
 		}
-		return toleranceReached;
+		//this.logToConsole(now + ' memoryrestart.shouldMinimize minimize='+minimize+' prev='+ TeamEXtension.prevMinimizedMemoryTS);
+		return minimize;
 	},
 	
 	getMemoryUsedInMB: function() {
