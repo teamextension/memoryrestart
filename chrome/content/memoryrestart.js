@@ -25,7 +25,7 @@ TeamEXtension.MemoryRestart = {
 					TeamEXtension.MemoryRestart.prefCleanUp(addon);
 					TeamEXtension.MemoryRestart.clearAllTimers();
 					prefs.removeObserver("", this);
-				},
+				}
 			};
 			AddonManager.addAddonListener(this.listener); 
 
@@ -34,7 +34,7 @@ TeamEXtension.MemoryRestart = {
 					TeamEXtension.MemoryRestart.prefCleanUp(addon);
 					TeamEXtension.MemoryRestart.clearAllTimers();
 					prefs.removeObserver("", this);
-				},
+				}
 			};
 			AddonManager.addInstallListener(this.installListener);
 		} catch(e) {
@@ -336,6 +336,28 @@ TeamEXtension.MemoryRestart = {
 		}
 		
 		sendHeapMinNotificationsInner();
+	},
+
+	restartFirefoxMenuFilePopup: function() {
+		this.restartFirefox();
+	},
+
+	restartFirefoxAppmenuPrimaryPane: function() {
+		this.restartFirefox();
+	},
+
+	restartFirefoxBrowserToolbarPalette: function() {
+		this.restartFirefox();
+	},
+
+	restartFirefoxStatusBar: function(event) {
+		if (this.isLeftClick(event)) {
+			this.restartFirefox();
+		}
+	},
+
+	isLeftClick: function(event) {
+		return event.button == 0;
 	}
 };
 

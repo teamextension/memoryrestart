@@ -10,11 +10,11 @@
 	</stringbundleset>
 
 	<menupopup id="menu_FilePopup">
-		<menuitem id="menu_restart" label="&menu.file.restart.label;" insertbefore="menu_FileQuitItem" oncommand="TeamEXtension.MemoryRestart.restartFirefox()" />
+		<menuitem id="memoryrestart-menu-restart" label="&menu.file.restart.label;" insertbefore="menu_FileQuitItem" oncommand="TeamEXtension.MemoryRestart.restartFirefoxMenuFilePopup()" />
 	</menupopup>
 	
 	<vbox id="appmenuPrimaryPane">
-		<menuitem id="appmenu-restart" label="&menu.file.restart.label;" insertbefore="appmenu-quit" oncommand="TeamEXtension.MemoryRestart.restartFirefox()" class="menuitem-iconic"/>
+		<menuitem id="memoryrestart-appmenu-restart" label="&menu.file.restart.label;" insertbefore="appmenu-quit" oncommand="TeamEXtension.MemoryRestart.restartFirefoxAppmenuPrimaryPane()" class="menuitem-iconic"/>
 	</vbox>
 	
 	<popupset> 
@@ -22,11 +22,11 @@
 	</popupset> 
 	
 	<toolbarpalette id="BrowserToolbarPalette">
-		<toolbarbutton id="memoryrestart-button" class="toolbarbutton-1" label="&toolbar.label;" tooltip="memoryrestart-button-tt" oncommand="TeamEXtension.MemoryRestart.restartFirefox()" />
+		<toolbarbutton id="memoryrestart-button" class="toolbarbutton-1" label="&toolbar.label;" tooltip="memoryrestart-button-tt" oncommand="TeamEXtension.MemoryRestart.restartFirefoxBrowserToolbarPalette()" />
 	</toolbarpalette>
 
 	<statusbar id="status-bar">
-		<statusbarpanel id="memoryrestart-panel" onclick="TeamEXtension.MemoryRestart.restartFirefox()" />
+		<statusbarpanel id="memoryrestart-panel" onclick="TeamEXtension.MemoryRestart.restartFirefoxStatusBar(event)" />
 	</statusbar>
 	
 </overlay>
