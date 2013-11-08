@@ -52,8 +52,22 @@ TeamEXtension.MemoryRestart = {
 	
 	refreshMemory: function()
 	{
-		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);		
+		if (this.usingOldMemoryReporter()) {
+			this.refreshMemoryOld();
+		} else {
+			this.refreshMemoryNew();
+		}
+	},
+	
+	refreshMemoryOld: function()
+	{
 		var memoryUsedInMB = this.getMemoryUsedInMB();		
+		this.refreshMemoryCommon(memoryUsedInMB);
+	},
+	
+	refreshMemoryCommon: function(memoryUsedInMB)
+	{
+		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);		
 		var memoryrestartToolbar = document.getElementById('memoryrestart-button');
 		var memoryrestartPanel = document.getElementById('memoryrestart-panel');
 		memoryrestartPanel.label = memoryUsedInMB + "MB";
@@ -110,6 +124,17 @@ TeamEXtension.MemoryRestart = {
 		}
 	},
 	
+	refreshMemoryNew: function() {
+		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+		var memoryReporterManager = Cc["@mozilla.org/memory-reporter-manager;1"].getService(Ci.nsIMemoryReporterManager);
+		
+		var e = memoryReporterManager.enumerateReporters();
+		while (e.hasMoreElements()) {
+			var mr = e.getNext().QueryInterface(Ci.nsIMemoryReporter);
+			mr.collectReports(this.refreshMemoryNewCallback, null);
+		}
+	},
+	
 	shouldMinimize: function(now) {
 		var minimize = false;
 		if (TeamEXtension.prevMemWasBelowThreshold) {
@@ -129,6 +154,19 @@ TeamEXtension.MemoryRestart = {
 		return minimize;
 	},
 	
+	// https://bugzilla.mozilla.org/show_bug.cgi?id=910517
+	// http://blog.mozilla.org/meeting-notes/archives/tag/mozillaplatform
+	// https://wiki.mozilla.org/Platform/2013-09-17
+	// nsIMemoryReporter is deprecated but the api name is repurposed
+	// nsIMemoryMultiReporter is renamed to nsIMemoryReporter
+	usingOldMemoryReporter: function() {
+		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+		var memoryReporterManager = Cc["@mozilla.org/memory-reporter-manager;1"].getService(Ci.nsIMemoryReporterManager);
+		var e = memoryReporterManager.enumerateReporters();
+		var mr = e.getNext().QueryInterface(Ci.nsIMemoryReporter);
+		return (mr.path !== undefined);
+	},
+
 	getMemoryUsedInMB: function() {
 		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
 		var memoryReporterManager = Cc["@mozilla.org/memory-reporter-manager;1"].getService(Ci.nsIMemoryReporterManager);
@@ -172,6 +210,16 @@ TeamEXtension.MemoryRestart = {
 		}
 		var memoryUsedInMB = memoryUsed / (1024 * 1024);
 		return memoryUsedInMB.toFixed();
+	},
+	
+	refreshMemoryNewCallback: function(aProcess, aUnsafePath, aKind, aUnits, aAmount, aDescription) 
+	{
+		if (aUnsafePath == 'resident') {
+//			TeamEXtension.MemoryRestart.logToConsole('refreshMemoryNewCallback aProcess='+aProcess+', aUnsafePath='+aUnsafePath+', aKind='+aKind+', aUnits='+aUnits+', aAmount='+aAmount+', aDescription='+aDescription);
+			var memoryUsedInMB = (aAmount / (1024 * 1024)).toFixed();
+			TeamEXtension.MemoryRestart.refreshMemoryCommon(memoryUsedInMB);
+		}
+		
 	},
 
 	restartFirefox: function()
