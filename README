@@ -1,6 +1,11 @@
 Firefox Memory Restart
 
 Development
-1. Create a text file called %USER-DIR%\Application Data\Mozilla\Firefox\Profiles\extensions\memoryrestart@teamextension.com
+1. Create a text file called %USER-DIR%\Application Data\Mozilla\Firefox\Profiles\extensions\memoryrestart@teamextension.com or %USER-DIR%\AppData\Roaming\Mozilla\Firefox\Profiles\%RANDOM%.default\extensions\memoryrestart@teamextension.com".
 2. Inside the text file, insert the text "C:\tex\dev\workspaces\teamextension\memoryrestart\".
 3. For more information, see https://developer.mozilla.org/en/Building_an_Extension.
+
+Deployment
+1. Update version in build.properties and install.rdf.
+2. Run ant.
+3. Upload dist\memoryrestart-${version}-fx.xpi to https://addons.mozilla.org/en-US/developers/addon/memory-restart/versions.
