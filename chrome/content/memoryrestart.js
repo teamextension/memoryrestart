@@ -67,7 +67,7 @@ TeamEXtension.MemoryRestart = {
 	
 	refreshMemoryCommon: function(memoryUsedInMB)
 	{
-		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);		
+		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
 		var memoryrestartToolbar = document.getElementById('memoryrestart-button');
 		var memoryrestartPanel = document.getElementById('memoryrestart-panel');
 		memoryrestartPanel.label = memoryUsedInMB + "MB";
@@ -125,13 +125,24 @@ TeamEXtension.MemoryRestart = {
 	},
 	
 	refreshMemoryNew: function() {
-		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
 		var memoryReporterManager = Cc["@mozilla.org/memory-reporter-manager;1"].getService(Ci.nsIMemoryReporterManager);
 		
 		var e = memoryReporterManager.enumerateReporters();
-		while (e.hasMoreElements()) {
+		
+		var found = false;
+		var callback = {
+			"callback": function(process, path, kind, units, amount, description) {
+				if (path == "resident") {
+					found = true;
+					TeamEXtension.MemoryRestart.refreshMemoryNewCallback(process, path, kind, units, amount, description)
+				}
+			}
+		}
+		
+		while (e.hasMoreElements() && !found) {
 			var mr = e.getNext().QueryInterface(Ci.nsIMemoryReporter);
-			mr.collectReports(this.refreshMemoryNewCallback, null);
+			// mr.collectReports(this.refreshMemoryNewCallback, null); this line cause a spike in CPU 
+			mr.collectReports(callback, null);
 		}
 	},
 	
@@ -160,7 +171,6 @@ TeamEXtension.MemoryRestart = {
 	// nsIMemoryReporter is deprecated but the api name is repurposed
 	// nsIMemoryMultiReporter is renamed to nsIMemoryReporter
 	usingOldMemoryReporter: function() {
-		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
 		var memoryReporterManager = Cc["@mozilla.org/memory-reporter-manager;1"].getService(Ci.nsIMemoryReporterManager);
 		var e = memoryReporterManager.enumerateReporters();
 		var mr = e.getNext().QueryInterface(Ci.nsIMemoryReporter);
@@ -212,11 +222,11 @@ TeamEXtension.MemoryRestart = {
 		return memoryUsedInMB.toFixed();
 	},
 	
-	refreshMemoryNewCallback: function(aProcess, aUnsafePath, aKind, aUnits, aAmount, aDescription) 
+	refreshMemoryNewCallback: function(process, path, kind, units, amount, description) 
 	{
-		if (aUnsafePath == 'resident') {
-//			TeamEXtension.MemoryRestart.logToConsole('refreshMemoryNewCallback aProcess='+aProcess+', aUnsafePath='+aUnsafePath+', aKind='+aKind+', aUnits='+aUnits+', aAmount='+aAmount+', aDescription='+aDescription);
-			var memoryUsedInMB = (aAmount / (1024 * 1024)).toFixed();
+		if (path == 'resident') {
+//			TeamEXtension.MemoryRestart.logToConsole('refreshMemoryNewCallback process='+process+', unsafePath='+unsafePath+', kind='+kind+', units='+units+', amount='+amount+', description='+description);
+			var memoryUsedInMB = (amount / (1024 * 1024)).toFixed();
 			TeamEXtension.MemoryRestart.refreshMemoryCommon(memoryUsedInMB);
 		}
 		
