@@ -12,8 +12,12 @@ TeamEXtension.prevMinimizedMemoryTS = -1;
 
 TeamEXtension.prevMemWasBelowThreshold = true;
 
+TeamEXtension.globalPreferences;
+
 TeamEXtension.MemoryRestart = {
 	onLoad: function() {
+		globalPreferences = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+		
 		var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService).getBranch("extensions.memoryrestart.");
 		prefs.QueryInterface(Ci.nsIPrefBranch2);
 		prefs.addObserver("", this, false);
@@ -50,8 +54,7 @@ TeamEXtension.MemoryRestart = {
 		this.setTimerRefreshMemory();
 	},
 	
-	refreshMemory: function()
-	{
+	refreshMemory: function() {
 		if (this.usingOldMemoryReporter()) {
 			this.refreshMemoryOld();
 		} else {
@@ -59,15 +62,14 @@ TeamEXtension.MemoryRestart = {
 		}
 	},
 	
-	refreshMemoryOld: function()
-	{
+	refreshMemoryOld: function() {
 		var memoryUsedInMB = this.getMemoryUsedInMB();		
 		this.refreshMemoryCommon(memoryUsedInMB);
 	},
 	
-	refreshMemoryCommon: function(memoryUsedInMB)
-	{
-		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+	refreshMemoryCommon: function(memoryUsedInMB) {
+		var prefService = globalPreferences;
+		
 		var memoryrestartToolbar = document.getElementById('memoryrestart-button');
 		var memoryrestartPanel = document.getElementById('memoryrestart-panel');
 		memoryrestartPanel.label = memoryUsedInMB + "MB";
