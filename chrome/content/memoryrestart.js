@@ -131,21 +131,45 @@ TeamEXtension.MemoryRestart = {
 		
 		var e = memoryReporterManager.enumerateReporters();
 		
-		var found = false;
+		var check_resident = true;
+		var check_private = true;
+		
+		var check_resident = true;
+		var check_private = true;
+		var memoryUsed = 0;
 		var callback = {
 			"callback": function(process, path, kind, units, amount, description) {
-				if (path == "resident") {
-					found = true;
-					TeamEXtension.MemoryRestart.refreshMemoryNewCallback(process, path, kind, units, amount, description)
+				if (check_resident && path == "resident") {
+					var memoryUsed_resident = amount;
+					if (memoryUsed_resident == undefined) {
+						memoryUsed_resident = amount;
+					}
+					if (memoryUsed_resident != undefined && memoryUsed < memoryUsed_resident) {
+						memoryUsed = memoryUsed_resident;
+					}
+					check_resident = false;
+				}
+				if (check_private && path == "private") {
+					var memoryUsed_private = amount;
+					if (memoryUsed_private == undefined) {
+						memoryUsed_private = amount;
+					}
+					if (memoryUsed_private != undefined && memoryUsed < memoryUsed_private) {
+						memoryUsed = memoryUsed_private;
+					}
+					check_private = false;
 				}
 			}
 		}
 		
-		while (e.hasMoreElements() && !found) {
+		while (e.hasMoreElements() && (check_resident || check_private)) {
 			var mr = e.getNext().QueryInterface(Ci.nsIMemoryReporter);
 			// mr.collectReports(this.refreshMemoryNewCallback, null); this line cause a spike in CPU 
 			mr.collectReports(callback, null);
 		}
+		
+		var memoryUsedInMB = (memoryUsed / (1024 * 1024)).toFixed();
+		this.refreshMemoryCommon(memoryUsedInMB);		
 	},
 	
 	shouldMinimize: function(now) {
@@ -222,16 +246,6 @@ TeamEXtension.MemoryRestart = {
 		}
 		var memoryUsedInMB = memoryUsed / (1024 * 1024);
 		return memoryUsedInMB.toFixed();
-	},
-	
-	refreshMemoryNewCallback: function(process, path, kind, units, amount, description) 
-	{
-		if (path == 'resident') {
-//			TeamEXtension.MemoryRestart.logToConsole('refreshMemoryNewCallback process='+process+', unsafePath='+unsafePath+', kind='+kind+', units='+units+', amount='+amount+', description='+description);
-			var memoryUsedInMB = (amount / (1024 * 1024)).toFixed();
-			TeamEXtension.MemoryRestart.refreshMemoryCommon(memoryUsedInMB);
-		}
-		
 	},
 
 	restartFirefox: function()
