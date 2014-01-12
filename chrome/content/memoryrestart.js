@@ -248,11 +248,11 @@ TeamEXtension.MemoryRestart = {
 		return memoryUsedInMB.toFixed();
 	},
 
-	restartFirefox: function()
+	restartFirefox: function(checkPrompt)
 	{
 		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
 		var showprompt = prefService.getBoolPref("extensions.memoryrestart.showprompt");
-		if (showprompt) {
+		if ((checkPrompt == undefined || checkPrompt) && showprompt) {
 			var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
 			var strings = document.getElementById("memoryrestart-strings");
 			
@@ -413,7 +413,7 @@ TeamEXtension.MemoryRestart = {
 	},
 
 	restartFirefoxMenuFilePopup: function() {
-		this.restartFirefox();
+		this.restartFirefox(false);
 	},
 
 	restartFirefoxAppmenuPrimaryPane: function() {
