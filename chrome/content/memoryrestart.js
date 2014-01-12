@@ -14,6 +14,8 @@ TeamEXtension.prevMemWasBelowThreshold = true;
 
 TeamEXtension.globalPreferences;
 
+TeamEXtension.browserMemoryUsedInMb = -1;
+
 TeamEXtension.MemoryRestart = {
 	onLoad: function() {
 		globalPreferences = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
@@ -69,6 +71,13 @@ TeamEXtension.MemoryRestart = {
 	
 	refreshMemoryCommon: function(memoryUsedInMB) {
 		var prefService = globalPreferences;
+		
+		var memoryIncreased = prefService.getIntPref("extensions.memoryrestart.memoryincreased");
+		var memoryGap = memoryUsedInMB - TeamEXtension.browserMemoryUsedInMb;
+		if (TeamEXtension.browserMemoryUsedInMb != -1 && memoryGap >= memoryIncreased) {
+			alert('Consumed memory had increased with ' + memoryGap + 'Mb. Total memory is ' + memoryUsedInMB + 'Mb.');
+		}
+		TeamEXtension.browserMemoryUsedInMb = memoryUsedInMB;
 		
 		var memoryrestartToolbar = document.getElementById('memoryrestart-button');
 		var memoryrestartPanel = document.getElementById('memoryrestart-panel');

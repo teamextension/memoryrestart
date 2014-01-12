@@ -11,6 +11,7 @@
       <preference id="memoryrestart-showprompt" name="extensions.memoryrestart.showprompt" type="bool"/>
       <preference id="memoryrestart-refreshinterval" name="extensions.memoryrestart.refreshinterval" type="int"/>
       <preference id="memoryrestart-minimizememory" name="extensions.memoryrestart.minimizememory" type="bool"/>
+      <preference id="memoryrestart-memoryincreased" name="extensions.memoryrestart.memoryincreased" type="int"/>
     </preferences>
 	<grid>
 	  <columns>
@@ -35,6 +36,10 @@
 		    <label control="memoryrestart-textrefreshinterval">&refreshinterval.label;</label>
 		    <textbox id="memoryrestart-textrefreshinterval" preference="memoryrestart-refreshinterval" size="10" maxlength="10" />
 	    </row>
+         <row>
+            <label control="memoryrestart-textmemoryincreased">&memoryincreased.label;</label>
+            <textbox id="memoryrestart-textmemoryincreased" preference="memoryrestart-memoryincreased" size="10" maxlength="10" />
+         </row>
 	    <hbox>
 	    	<checkbox id="memoryrestart-autorestart" preference="memoryrestart-autorestart"/>
 	    	<label control="memoryrestart-autorestart">&autorestart.label;</label>

@@ -9,3 +9,4 @@
 <!ENTITY memorylimit.error "Minimum of 250MB is allowed">
 <!ENTITY minimizememory.label "Minimize memory when threshold reached">
 <!ENTITY minimizememorytolerancepercent.label "Minimize tolerance &#37; (recommended 10)">
+<!ENTITY memoryincreased.label "Alert when memory increased from last check (-1 to disable) reaches this threshold">
