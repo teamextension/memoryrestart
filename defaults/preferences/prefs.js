@@ -8,7 +8,7 @@ pref("extensions.memoryrestart.showprompt", true);
 pref("extensions.memoryrestart.refreshinterval", 60);
 pref("extensions.memoryrestart.minimizememory", true);
 pref("extensions.memoryrestart.minimizememory.interval.mins", 10);
-pref("extensions.memoryrestart.memoryincreased", 200);
+pref("extensions.memoryrestart.memoryincreased", 250);
 
 // https://developer.mozilla.org/en/Localizing_extension_descriptions
 pref("extensions.memoryrestart@teamextension.com.description", "chrome://memoryrestart/locale/memoryrestart.properties");
