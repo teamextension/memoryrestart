@@ -75,7 +75,7 @@ TeamEXtension.MemoryRestart = {
 		var memoryIncreased = prefService.getIntPref("extensions.memoryrestart.memoryincreased");
 		var memoryGap = memoryUsedInMB - TeamEXtension.browserMemoryUsedInMb;
 		if (TeamEXtension.browserMemoryUsedInMb != -1 && memoryGap >= memoryIncreased) {
-			this.browserAlert('Firefox memory has increased by more than ' + memoryGap + 'Mb since last refresh interval. You can configure this alert via Memory Restart options');
+			this.browserAlert('Firefox memory has increased by more than ' + memoryGap + 'Mb since last refresh interval. You can configure this alert via Memory Restart options.');
 		}
 		TeamEXtension.browserMemoryUsedInMb = memoryUsedInMB;
 		
