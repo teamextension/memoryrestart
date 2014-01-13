@@ -75,7 +75,7 @@ TeamEXtension.MemoryRestart = {
 		var memoryIncreased = prefService.getIntPref("extensions.memoryrestart.memoryincreased");
 		var memoryGap = memoryUsedInMB - TeamEXtension.browserMemoryUsedInMb;
 		if (TeamEXtension.browserMemoryUsedInMb != -1 && memoryGap >= memoryIncreased) {
-			alert('Consumed memory had increased with ' + memoryGap + 'Mb. Total memory is ' + memoryUsedInMB + 'Mb.');
+			this.browserAlert('Firefox memory has increased by more than ' + memoryGap + 'Mb since last refresh interval. You can configure this alert via Memory Restart options');
 		}
 		TeamEXtension.browserMemoryUsedInMb = memoryUsedInMB;
 		
@@ -291,6 +291,23 @@ TeamEXtension.MemoryRestart = {
 	{
 		var consoleService = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
 		consoleService.logStringMessage(message);
+	},
+	
+	browserAlert: function(message) 
+	{
+		//https://developer.mozilla.org/en-US/Add-ons/Overlay_Extensions/XUL_School/User_Notifications_and_Alerts
+		//try {
+		//	var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
+		//	alertsService.showAlertNotification(null, '', message, false, '', null);
+		//} catch (err) {
+		//	alert(message);
+		//}	
+		var nb = gBrowser.getNotificationBox();
+		var value = 'memory restart memory spike alert';
+		var delayInSecs = 3;
+		nb.appendNotification(message, value, null, nb.PRIORITY_WARNING_HIGH);
+		//remove the notification
+		setTimeout(function(){var notification = gBrowser.getNotificationBox().getNotificationWithValue(value); if (notification != null) notification.close();}, delayInSecs * 1000);
 	},
 
 	firstRun: function() {
