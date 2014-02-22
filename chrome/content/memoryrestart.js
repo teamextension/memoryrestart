@@ -2,8 +2,6 @@ if ("undefined" == typeof(TeamEXtension)) {
 	var TeamEXtension = {};
 };
 
-TeamEXtension.intervalId;
-
 TeamEXtension.intervalIdAutoRestart;
 
 TeamEXtension.minimizeMemoryUsageCaller = false;
@@ -16,9 +14,11 @@ TeamEXtension.globalPreferences;
 
 TeamEXtension.browserMemoryUsedInMb = -1;
 
+TeamEXtension.mainTimer;
+
 TeamEXtension.MemoryRestart = {
 	onLoad: function() {
-		globalPreferences = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+		TeamEXtension.globalPreferences = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
 		
 		var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService).getBranch("extensions.memoryrestart.");
 		prefs.QueryInterface(Ci.nsIPrefBranch2);
@@ -70,7 +70,7 @@ TeamEXtension.MemoryRestart = {
 	},
 	
 	refreshMemoryCommon: function(memoryUsedInMB) {
-		var prefService = globalPreferences;
+		var prefService = TeamEXtension.globalPreferences;
 		
 		var memoryIncreased = prefService.getIntPref("extensions.memoryrestart.memoryincreased");
 		var memoryGap = memoryUsedInMB - TeamEXtension.browserMemoryUsedInMb;
@@ -135,47 +135,11 @@ TeamEXtension.MemoryRestart = {
 		}
 	},
 	
+	//based on https://bugzilla.mozilla.org/show_bug.cgi?id=969407
 	refreshMemoryNew: function() {
 		var memoryReporterManager = Cc["@mozilla.org/memory-reporter-manager;1"].getService(Ci.nsIMemoryReporterManager);
-		
-		var e = memoryReporterManager.enumerateReporters();
-		
-		var check_resident = true;
-		var check_private = true;
-		var memoryUsed = 0;
-		var callback = {
-			"callback": function(process, path, kind, units, amount, description) {
-				if (check_resident && path == "resident") {
-					var memoryUsed_resident = amount;
-					if (memoryUsed_resident == undefined) {
-						memoryUsed_resident = amount;
-					}
-					if (memoryUsed_resident != undefined && memoryUsed < memoryUsed_resident) {
-						memoryUsed = memoryUsed_resident;
-					}
-					check_resident = false;
-				}
-				if (check_private && path == "private") {
-					var memoryUsed_private = amount;
-					if (memoryUsed_private == undefined) {
-						memoryUsed_private = amount;
-					}
-					if (memoryUsed_private != undefined && memoryUsed < memoryUsed_private) {
-						memoryUsed = memoryUsed_private;
-					}
-					check_private = false;
-				}
-			}
-		}
-		
-		while (e.hasMoreElements() && (check_resident || check_private)) {
-			var mr = e.getNext().QueryInterface(Ci.nsIMemoryReporter);
-			// mr.collectReports(this.refreshMemoryNewCallback, null); this line cause a spike in CPU 
-			mr.collectReports(callback, null);
-		}
-		
-		var memoryUsedInMB = (memoryUsed / (1024 * 1024)).toFixed();
-		this.refreshMemoryCommon(memoryUsedInMB);		
+		var memoryUsedInMB = (memoryReporterManager.residentFast / 1048576).toFixed();
+		this.refreshMemoryCommon(memoryUsedInMB);
 	},
 	
 	shouldMinimize: function(now) {
@@ -384,8 +348,9 @@ TeamEXtension.MemoryRestart = {
 	},
 	
 	clearAllTimers: function() {
-		if (TeamEXtension.intervalId !== undefined) {
-			window.clearInterval(TeamEXtension.intervalId);
+		if (TeamEXtension.mainTimer !== undefined) {
+			TeamEXtension.mainTimer.cancel();
+			TeamEXtension.mainTimer = undefined;
 		}
 		if (TeamEXtension.intervalIdAutoRestart !== undefined) {
 			window.clearInterval(TeamEXtension.intervalIdAutoRestart);
@@ -395,10 +360,13 @@ TeamEXtension.MemoryRestart = {
 	setTimerRefreshMemory: function() {
 		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
 		var refreshInterval = prefService.getIntPref("extensions.memoryrestart.refreshinterval");
-		if (TeamEXtension.intervalId !== undefined) {
-			window.clearInterval(TeamEXtension.intervalId);
+		var event = {
+			notify: function(timer) {
+				TeamEXtension.MemoryRestart.refreshMemory(); 
+			}
 		}
-		TeamEXtension.intervalId = window.setInterval(function() { TeamEXtension.MemoryRestart.refreshMemory(); }, refreshInterval * 1000);
+		TeamEXtension.mainTimer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
+		TeamEXtension.mainTimer.initWithCallback(event, refreshInterval*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
 	},
 	
 	observe: function(subject, topic, data) {
