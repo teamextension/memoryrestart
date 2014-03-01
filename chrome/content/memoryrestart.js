@@ -138,7 +138,11 @@ TeamEXtension.MemoryRestart = {
 	//based on https://bugzilla.mozilla.org/show_bug.cgi?id=969407
 	refreshMemoryNew: function() {
 		var memoryReporterManager = Cc["@mozilla.org/memory-reporter-manager;1"].getService(Ci.nsIMemoryReporterManager);
-		var memoryUsedInMB = (memoryReporterManager.residentFast / 1048576).toFixed();
+		var memoryUsed = memoryReporterManager.residentFast;
+		if (memoryUsed === undefined) {
+			memoryUsed = memoryReporterManager.resident;
+		}
+		var memoryUsedInMB = (memoryUsed / 1048576).toFixed();
 		this.refreshMemoryCommon(memoryUsedInMB);
 	},
 	
