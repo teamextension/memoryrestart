@@ -86,21 +86,21 @@ TeamEXtension.MemoryRestart = {
 		var memoryLimit = prefService.getIntPref("extensions.memoryrestart.memorylimit");
 		if (memoryLimit < memoryUsedInMB) {
 			var colorAboveLimit = prefService.getCharPref("extensions.memoryrestart.colorabovelimit");
+			var tooltipText = strings.getString("extensions.memoryrestart.tooltip.high");
 			memoryrestartPanel.style.color = colorAboveLimit;
-			memoryrestartPanel.tooltipText = strings.getString("extensions.memoryrestart.tooltip.high");
+			memoryrestartPanel.tooltipText = tooltipText;
 			if (memoryrestartToolbar != null) {
 				memoryrestartToolbar.style.listStyleImage = "url('chrome://memoryrestart/skin/above16.png')";
 				var memoryrestartButtonTt = document.getElementById('memoryrestart-button-tt');
 				memoryrestartButtonTt.label = memoryUsedInMB + "MB";
 			}
 			var minimizeMemory = prefService.getBoolPref("extensions.memoryrestart.minimizememory");
-			if (minimizeMemory && TeamEXtension.minimizeMemoryUsageCaller == false) {
-				var now = Date.now();
-				if (this.shouldMinimize(now)) {
-					TeamEXtension.prevMinimizedMemoryTS = now;
-					TeamEXtension.minimizeMemoryUsageCaller = true; 
-					this.minimizeMemoryUsage3x(function() { TeamEXtension.MemoryRestart.refreshMemory(); });
-				}
+			var now = Date.now();
+			//this.logToConsole('minimizeMemory='+minimizeMemory+', TeamEXtension.minimizeMemoryUsageCaller='+TeamEXtension.minimizeMemoryUsageCaller);
+			if (minimizeMemory && TeamEXtension.minimizeMemoryUsageCaller == false && this.shouldMinimize(now)) {
+				TeamEXtension.prevMinimizedMemoryTS = now;
+				TeamEXtension.minimizeMemoryUsageCaller = true; 
+				this.minimizeMemoryUsage3x(function() { TeamEXtension.MemoryRestart.refreshMemory(); });
 			} else { // act as a callback of minimizeMemoryUsage3x when the indicator minimizeMemoryUsageCaller is set to false
 				/* disable tooltip to notify user after memory is minimized
 				if (minimizeMemory) {
@@ -115,6 +115,7 @@ TeamEXtension.MemoryRestart = {
 				*/
 				TeamEXtension.minimizeMemoryUsageCaller = false;
 				var autoRestart = prefService.getBoolPref("extensions.memoryrestart.autorestart");
+				//this.logToConsole('autoRestart='+autoRestart);
 				if (autoRestart) {
 					var autoRestartDelay = prefService.getIntPref("extensions.memoryrestart.autorestart.delay");
 					this.quit(autoRestartDelay);
@@ -124,8 +125,9 @@ TeamEXtension.MemoryRestart = {
 		} else {
 			TeamEXtension.minimizeMemoryUsageCaller = false;
 			var colorBelowLimit = prefService.getCharPref("extensions.memoryrestart.colorbelowlimit");
+			var tooltipText = strings.getString("extensions.memoryrestart.tooltip.normal");
 			memoryrestartPanel.style.color = colorBelowLimit;
-			memoryrestartPanel.tooltipText = strings.getString("extensions.memoryrestart.tooltip.normal");
+			memoryrestartPanel.tooltipText = tooltipText;
 			if (memoryrestartToolbar != null) {
 				memoryrestartToolbar.style.listStyleImage = "url('chrome://memoryrestart/skin/below16.png')";
 				var memoryrestartButtonTt = document.getElementById('memoryrestart-button-tt');
@@ -133,6 +135,7 @@ TeamEXtension.MemoryRestart = {
 			}
 			TeamEXtension.prevMemWasBelowThreshold = true;			
 		}
+		//this.logToConsole('refreshMemoryCommon -> TeamEXtension.prevMemWasBelowThreshold='+TeamEXtension.prevMemWasBelowThreshold);			
 	},
 	
 	//based on https://bugzilla.mozilla.org/show_bug.cgi?id=969407
@@ -148,7 +151,9 @@ TeamEXtension.MemoryRestart = {
 	
 	shouldMinimize: function(now) {
 		var minimize = false;
+		//this.logToConsole('TeamEXtension.prevMemWasBelowThreshold='+TeamEXtension.prevMemWasBelowThreshold);
 		if (TeamEXtension.prevMemWasBelowThreshold) {
+			//this.logToConsole('TeamEXtension.prevMinimizedMemoryTS='+TeamEXtension.prevMinimizedMemoryTS);
 			if (TeamEXtension.prevMinimizedMemoryTS == -1) {
 				minimize = true;
 				//this.logToConsole('memoryrestart.shouldMinimize minimize='+minimize+', 1st time');
@@ -229,8 +234,9 @@ TeamEXtension.MemoryRestart = {
 		if ((checkPrompt == undefined || checkPrompt) && showprompt) {
 			var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
 			var strings = document.getElementById("memoryrestart-strings");
-			
-			if (prompts.confirm(window, strings.getString("extensions.memoryrestart.label"), strings.getString("extensions.memoryrestart.prompt"))) {
+			var label = strings.getString("extensions.memoryrestart.label");
+			var message = strings.getString("extensions.memoryrestart.prompt");
+			if (prompts.confirm(window, label, message)) {
 				this.quit();
 			}
 		} else {
@@ -340,7 +346,8 @@ TeamEXtension.MemoryRestart = {
 		if (version != prevVersion) {
 			prefService.setCharPref("extensions.memoryrestart.version", version);
 			var strings = document.getElementById("memoryrestart-strings");
-			gBrowser.selectedTab = gBrowser.addTab(strings.getString("extensions.memoryrestart.url"));
+			var url = strings.getString("extensions.memoryrestart.url");
+			gBrowser.selectedTab = gBrowser.addTab(url);
 		}
 	},
 	
@@ -386,6 +393,7 @@ TeamEXtension.MemoryRestart = {
 	// notification.  See bug 610166 comment 12 for an explanation.
 	// Ideally a single notification would be enough.
 	minimizeMemoryUsage3x: function(fAfter) {
+		//this.logToConsole('minimizeMemoryUsage3x');		
 		var i = 0;
 
 		function runSoon(f) {
