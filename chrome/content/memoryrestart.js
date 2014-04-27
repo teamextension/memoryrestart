@@ -176,10 +176,17 @@ TeamEXtension.MemoryRestart = {
 	// nsIMemoryReporter is deprecated but the api name is repurposed
 	// nsIMemoryMultiReporter is renamed to nsIMemoryReporter
 	usingOldMemoryReporter: function() {
-		var memoryReporterManager = Cc["@mozilla.org/memory-reporter-manager;1"].getService(Ci.nsIMemoryReporterManager);
-		var e = memoryReporterManager.enumerateReporters();
-		var mr = e.getNext().QueryInterface(Ci.nsIMemoryReporter);
-		return (mr.path !== undefined);
+		var returnValue = true;
+		try {
+    		var memoryReporterManager = Cc["@mozilla.org/memory-reporter-manager;1"].getService(Ci.nsIMemoryReporterManager);
+    		var e = memoryReporterManager.enumerateReporters();
+    		var mr = e.getNext().QueryInterface(Ci.nsIMemoryReporter);
+    		returnValue = (mr.path !== undefined);
+		} catch (err) {
+			this.logToConsole('usingOldMemoryReporter err=' + err);
+			returnValue = false;
+		}
+		return returnValue;
 	},
 
 	getMemoryUsedInMB: function() {
