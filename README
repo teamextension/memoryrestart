@@ -11,4 +11,4 @@ Deployment
 3. Upload dist\memoryrestart-${version}-fx.xpi to https://addons.mozilla.org/en-US/developers/addon/memory-restart/versions.
 
 Powered By
-[Config](http://www.configapp.com "Config") - Easy Configuration File Management
+[Config](http://www.configapp.com) - Easy Configuration File Management
